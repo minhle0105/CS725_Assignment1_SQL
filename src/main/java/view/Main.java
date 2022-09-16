@@ -3,7 +3,6 @@ package view;
 import controller.ProductController;
 import controller.UserController;
 import db_connection.MyJDBC;
-import io.codearte.jfairy.Fairy;
 import model.Product;
 import model.Review;
 import model.User;
@@ -13,196 +12,16 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.util.*;
 
-public class Main {
+public class Main extends Thread {
+
+    static List<Integer> operationIds;
 
     static ProductController productController;
     static UserController userController;
 
-    static StringBuilder alphabet = new StringBuilder();
+    static StringBuilder alphabet;
 
     static Random random;
-
-//    public static void main(String[] args) throws SQLException {
-//        Scanner sc = new Scanner(System.in);
-////        System.out.println("Enter SQL username: ");
-////        String db_user = sc.nextLine();
-////        System.out.println("Enter SQL password: ");
-////        String db_password = sc.nextLine();
-//        String db_user = args[0];
-//        String db_password = args[1];
-//        MyJDBC jdbc = new MyJDBC(db_user, db_password);
-//        jdbc.connect();
-//        Connection connection = jdbc.getConnection();
-//        UserController userController = new UserController(connection);
-//        ProductController productController = new ProductController(connection);
-//        while (true) {
-//            System.out.println("Enter choice: ");
-//            int input = Integer.parseInt(sc.nextLine());
-//            if (input == 0) {
-//                break;
-//            }
-    // create account
-//            if (input == 1) {
-//                System.out.println("Enter username: ");
-//                String username = sc.nextLine();
-//                System.out.println("Enter password: ");
-//                String password = sc.nextLine();
-//                System.out.println("Enter firstname: ");
-//                String firstname = sc.nextLine();
-//                System.out.println("Enter lastname: ");
-//                String lastname = sc.nextLine();
-//                boolean res = userController.CreateAccount(username, password, firstname, lastname);
-//                if (res) {
-//                    System.out.println("Success");
-//                }
-//                else {
-//                    System.out.println("Fail");
-//                }
-//            }
-//            if (input == 2) {
-//                List<User> users = userController.findAll();
-//                for (User user : users) {
-//                    System.out.println(user);
-//                }
-//            }
-//            // place order
-//            if (input == 3) {
-//                System.out.println("Please log in");
-//                System.out.println("Enter username: ");
-//                String username = sc.nextLine();
-//                System.out.println("Enter password: ");
-//                String password = sc.nextLine();
-//                boolean isAuthenticated = userController.login(username, password);
-//                if (!isAuthenticated) {
-//                    System.out.println("Invalid login credentials");
-//                }
-//                else {
-//                    List<Product> products = productController.findAll();
-//                    for (Product product : products) {
-//                        System.out.println(product);
-//                    }
-//                    List<String> productNames = new ArrayList<>();
-//                    List<Integer> quantityDemanded = new ArrayList<>();
-//                    while (true) {
-//                        System.out.println("Enter product name, or press enter to end: ");
-//                        String name = sc.nextLine();
-//                        if (name.length() == 0) break;
-//                        System.out.println("Enter quantity: ");
-//                        int quant = Integer.parseInt(sc.nextLine());
-//                        productNames.add(name);
-//                        quantityDemanded.add(quant);
-//                    }
-//                    boolean res = userController.submitOrder(username, productNames, quantityDemanded);
-//                    if (res) {
-//                        System.out.println("Order submitted successfully");
-//                    }
-//                    else {
-//                        System.out.println("Fail to submit order");
-//                    }
-//                }
-//            }
-//            if (input == 4) {
-//                System.out.println("Please log in");
-//                System.out.println("Enter username: ");
-//                String username = sc.nextLine();
-//                System.out.println("Enter password: ");
-//                String password = sc.nextLine();
-//                boolean isAuthenticated = userController.login(username, password);
-//                if (!isAuthenticated) {
-//                    System.out.println("Invalid login credentials");
-//                }
-//                else {
-//                    List<String[]> purchasedProducts = userController.getPurchasedProduct(username);
-//                    for (String[] p : purchasedProducts) {
-//                        System.out.println("product ID: " + p[0] + ", product name: " + p[1]);
-//                    }
-//                    System.out.println("Please enter the id of the product you want to write review: ");
-//                    String id = sc.nextLine();
-//                    boolean hasReviewed = userController.checkReviewByProductId(username, id);
-//                    if (hasReviewed) {
-//                        System.out.println("You have already reviewed this product!");
-//                    }
-//                    else {
-//                        System.out.println("Please write your review (Maximum 1000 words): ");
-//                        String reviewText = sc.nextLine();
-//                        System.out.println("Please enter ratings (out of 5): ");
-//                        int rating = Integer.parseInt(sc.nextLine());
-//                        boolean res = userController.submitReview(new Review(username, id, new Date(Calendar.getInstance().getTime().getTime()), reviewText, rating));
-//                        if (res) {
-//                            System.out.println("Successfully submitted review");
-//                        }
-//                        else {
-//                            System.out.println("Fail to submit reivew");
-//                        }
-//                    }
-//                }
-//            }
-//            if (input == 5) {
-//                System.out.println("Enter product ID: ");
-//                String id = sc.nextLine();
-//                System.out.println("Enter product name: ");
-//                String name = sc.nextLine();
-//                System.out.println("Enter product description: ");
-//                String description = sc.nextLine();
-//                System.out.println("Enter product price: ");
-//                double price = Double.parseDouble(sc.nextLine());
-//                System.out.println("Enter product quantity: ");
-//                int quantity = Integer.parseInt(sc.nextLine());
-//                Product p = new Product(id, name, description, price, quantity);
-//                boolean res = productController.add(p);
-//                if (res) {
-//                    System.out.println("Successfully added " + id + ".");
-//                }
-//                else {
-//                    System.out.println("Fail to add");
-//                }
-//            }
-//            if (input == 6) {
-//                System.out.println("Enter productId: ");
-//                String id = sc.nextLine();
-//                Product product = productController.getById(id);
-//                if (product == null) {
-//                    System.out.println("Fail");
-//                }
-//                else {
-//                    System.out.println("Enter number of stock units to add: ");
-//                    int quantity = Integer.parseInt(sc.nextLine());
-//                    boolean res = productController.updateStockUnit(product, quantity);
-//                    if (res) {
-//                        System.out.println("DONE");
-//                    }
-//                    else {
-//                        System.out.println("Fail");
-//                    }
-//                }
-//
-//            }
-//            if (input ==  7) {
-//                List<Product> products = productController.findAll();
-//                System.out.println("All products in stock");
-//                for (Product p : products) {
-//                    System.out.println(p);
-//                }
-//                System.out.println("Enter product id to see all reviews: ");
-//                String id = sc.nextLine();
-//                List<Review> reviews = productController.getReviewsByProduct(id);
-//                if (reviews.size() == 0) {
-//                    System.out.println("No reviews, or invalid product id.");
-//                }
-//                for (Review review : reviews) {
-//                    System.out.println(review);
-//                    System.out.println("-------------------------");
-//                }
-//            }
-//            if (input == 8) {
-//                System.out.println("Enter username to find average rating: ");
-//                String username = sc.nextLine();
-//                double res = userController.getAverageRatingByUser(username);
-//                System.out.println("Average rating user " + username + " has given is " + res);
-//            }
-//        }
-//        sc.close();
-//    }
 
     private static String generateRandomString(int length) {
         StringBuilder sb = new StringBuilder();
@@ -222,6 +41,7 @@ public class Main {
     }
 
     private static void generateAlphabetString() {
+        alphabet = new StringBuilder();
         for (int i = 65; i < 90; i++) {
             alphabet.append((char) i);
         }
@@ -290,28 +110,70 @@ public class Main {
         }
     }
 
+    private static void generateOperationIdsByProbability() {
+        for (int i = 0; i < 3; i++) {
+            operationIds.add(1);
+        }
+        for (int i = 0; i < 2; i++) {
+            operationIds.add(2);
+        }
+        for (int i = 0; i < 10; i++) {
+            operationIds.add(3);
+        }
+        for (int i = 0; i < 65; i++) {
+            operationIds.add(4);
+        }
+        for (int i = 0; i < 5; i++) {
+            operationIds.add(5);
+        }
+        for (int i = 0; i < 10; i++) {
+            operationIds.add(6);
+        }
+        for (int i = 0; i < 5; i++) {
+            operationIds.add(7);
+        }
+    }
+
     public static void main(String[] args) throws SQLException {
-        generateAlphabetString();
-        random = new Random();
         String db_user = args[0];
         String db_password = args[1];
         MyJDBC jdbc = new MyJDBC(db_user, db_password);
         jdbc.connect();
         Connection connection = jdbc.getConnection();
+
+        generateAlphabetString();
+        random = new Random();
+        operationIds = new ArrayList<>();
+        generateOperationIdsByProbability();
         productController = new ProductController(connection);
         userController = new UserController(connection);
-        List<Product> products = generateProducts(10);
+        List<Product> products = generateProducts(1000);
         for (Product product : products) {
             productController.add(product);
         }
-        List<User> users = generateUsers(10);
+        List<User> users = generateUsers(1000);
         for (User user : users) {
             userController.CreateAccount(user);
         }
-        List<Review> reviews = generateReviews(users, products, 200);
+        List<Review> reviews = generateReviews(users, products, 20000);
         for (Review review : reviews) {
             userController.submitReview(review);
         }
-        generateOrders(users, products, 100);
+        generateOrders(users, products, 10000);
+        System.out.println("DONE INITIALIZE DATABASE");
+        int i = 0;
+        while (i < 100) {
+            Thread thread1 = new MainThread(1);
+            Thread thread2 = new MainThread(2);
+//            Thread thread3 = new MainThread(3);
+//            Thread thread4 = new MainThread(4);
+//            Thread thread5 = new MainThread(5);
+            thread1.start();
+            thread2.start();
+//            thread3.start();
+//            thread4.start();
+//            thread5.start();
+            i++;
+        }
     }
 }
