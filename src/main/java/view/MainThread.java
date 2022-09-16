@@ -120,7 +120,7 @@ public class MainThread extends Thread {
             for (int j = 0; j < numberOfProducts; j++) {
                 int id = generateRandomInt(numberOfProducts);
                 productNames.add(products.get(id).getName());
-                int quantity = generateRandomInt(100);
+                int quantity = generateRandomInt(50);
                 quantities.add(quantity);
             }
         }

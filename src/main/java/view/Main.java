@@ -165,14 +165,14 @@ public class Main extends Thread {
         while (i < 100) {
             Thread thread1 = new MainThread(1);
             Thread thread2 = new MainThread(2);
-//            Thread thread3 = new MainThread(3);
-//            Thread thread4 = new MainThread(4);
-//            Thread thread5 = new MainThread(5);
+            Thread thread3 = new MainThread(3);
+            Thread thread4 = new MainThread(4);
+            Thread thread5 = new MainThread(5);
             thread1.start();
             thread2.start();
-//            thread3.start();
-//            thread4.start();
-//            thread5.start();
+            thread3.start();
+            thread4.start();
+            thread5.start();
             i++;
         }
     }

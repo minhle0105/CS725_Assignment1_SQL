@@ -107,7 +107,7 @@ public class ProductService implements IProductService{
 
     @Override
     public List<Review> getReviewByProduct(String id) throws SQLException {
-        String query = "SELECT * FROM Review WHERE product_id = ?;";
+        String query = "SELECT * FROM Reviews WHERE product_id = ?;";
         PreparedStatement p = connection.prepareStatement(query);
         p.setString(1, id);
         ResultSet resultSet = p.executeQuery();
