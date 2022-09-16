@@ -3,6 +3,7 @@ package service;
 import model.Product;
 import model.Review;
 
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,8 +123,17 @@ public class ProductService implements IProductService{
             reviews.add(review);
         }
         return reviews;
-
     }
 
-
+    @Override
+    public double calculatePercentageOfProductsWithStockLevelLessThan0() throws SQLException {
+        String query = "SELECT ((SELECT COUNT(*) FROM Products WHERE number_of_units < 0) / (SELECT COUNT(*) FROM Products)) as percentage;";
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        double res = 0.0;
+        while (resultSet.next()) {
+            res = Double.parseDouble(resultSet.getString(1));
+        }
+        return res;
+    }
 }

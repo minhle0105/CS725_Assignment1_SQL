@@ -18,4 +18,6 @@ public interface IProductService {
     boolean updateById(Product product, int countToAdd) throws SQLException;
 
     List<Review> getReviewByProduct(String id) throws SQLException;
+
+    double calculatePercentageOfProductsWithStockLevelLessThan0() throws SQLException;
 }

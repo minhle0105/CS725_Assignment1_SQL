@@ -174,6 +174,6 @@ public class MainThread extends Thread {
                 SubmitReview();
                 break;
         }
-        System.out.println("Thread " + threadId + " performs action " + operationIds.get(randomOperationIndex));
+//        System.out.println("Thread " + threadId + " performs action " + operationIds.get(randomOperationIndex));
     }
 }

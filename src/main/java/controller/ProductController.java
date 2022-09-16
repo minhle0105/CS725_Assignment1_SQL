@@ -35,4 +35,8 @@ public class ProductController {
     public List<Review> getReviewsByProduct(String product_id) throws SQLException {
         return productService.getReviewByProduct(product_id);
     }
+
+    public double calculatePercentageWithStockLevelLessThan0() throws SQLException {
+        return productService.calculatePercentageOfProductsWithStockLevelLessThan0();
+    }
 }
