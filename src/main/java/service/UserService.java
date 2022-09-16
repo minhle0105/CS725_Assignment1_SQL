@@ -92,7 +92,7 @@ public class UserService implements IUserService {
                 allValidPurchases = false;
                 break;
             }
-            int newQuantity = quantity - quantityDemanded + quantityDemanded;
+            int newQuantity = quantity - quantityDemanded;
             String updateQuantityQuery = "UPDATE Products SET number_of_units = ? WHERE name = ?;";
             CheckoutItem checkoutItem = new CheckoutItem(productId, quantityDemanded);
             checkoutItems.add(checkoutItem);

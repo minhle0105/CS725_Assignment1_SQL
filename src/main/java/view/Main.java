@@ -11,6 +11,8 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Main extends Thread {
 
@@ -100,10 +102,10 @@ public class Main extends Thread {
             List<String> productNames = new ArrayList<>();
             List<Integer> quantities = new ArrayList<>();
             int randomUserIndex = generateRandomInt(numberOfUsers);
-            for (int j = 0; j < numberOfProducts; j++) {
+            for (int j = 0; j < 10; j++) {
                 int id = generateRandomInt(numberOfProducts);
                 productNames.add(products.get(id).getName());
-                int quantity = generateRandomInt(30);
+                int quantity = generateRandomInt(10);
                 quantities.add(quantity);
             }
             userController.submitOrder(users.get(randomUserIndex).getUsername(), productNames, quantities);
@@ -133,6 +135,37 @@ public class Main extends Thread {
             operationIds.add(7);
         }
     }
+    private static void initializeDatabaseRecords() throws SQLException {
+        List<Product> products = generateProducts(1000);
+        for (Product product : products) {
+            productController.add(product);
+        }
+        List<User> users = generateUsers(1000);
+        for (User user : users) {
+            userController.CreateAccount(user);
+        }
+        List<Review> reviews = generateReviews(users, products, 20000);
+        for (Review review : reviews) {
+            userController.submitReview(review);
+        }
+        generateOrders(users, products, 10000);
+    }
+
+    private static void runThreads (int n) {
+        ExecutorService executor= Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        int c = 0;
+        while (c < 100) {
+            try {
+                for (int i = 0; i < n; i++) {
+                    executor.execute(new MainThread(i + 1));
+                }
+            } catch (Exception err) {
+                err.printStackTrace();
+            }
+            c++;
+        }
+        executor.shutdown(); // once you are done with ExecutorService
+    }
 
     public static void main(String[] args) throws SQLException {
         String db_user = args[0];
@@ -147,33 +180,13 @@ public class Main extends Thread {
         generateOperationIdsByProbability();
         productController = new ProductController(connection);
         userController = new UserController(connection);
-        List<Product> products = generateProducts(1000);
-        for (Product product : products) {
-            productController.add(product);
-        }
-        List<User> users = generateUsers(1000);
-        for (User user : users) {
-            userController.CreateAccount(user);
-        }
-        List<Review> reviews = generateReviews(users, products, 20000);
-        for (Review review : reviews) {
-            userController.submitReview(review);
-        }
-        generateOrders(users, products, 10000);
-        System.out.println("DONE INITIALIZE DATABASE");
-        int i = 0;
-        while (i < 100) {
-            Thread thread1 = new MainThread(1);
-            Thread thread2 = new MainThread(2);
-            Thread thread3 = new MainThread(3);
-            Thread thread4 = new MainThread(4);
-            Thread thread5 = new MainThread(5);
-            thread1.start();
-            thread2.start();
-            thread3.start();
-            thread4.start();
-            thread5.start();
-            i++;
-        }
+
+        initializeDatabaseRecords();
+
+//        for (int n = 1; n < 10; n++) {
+//            System.out.println("There are " + n + " threads running");
+//            runThreads(n);
+//            System.out.println("------------------------------------");
+//        }
     }
 }
