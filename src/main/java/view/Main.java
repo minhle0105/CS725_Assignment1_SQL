@@ -154,29 +154,6 @@ public class Main extends Thread {
         generateOrders(users, products, 10000);
     }
 
-    private static double[] runThreads (int n) throws SQLException {
-        double[] res = new double[2];
-        int numberOfOperations = 0;
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        long endTime = System.currentTimeMillis() + 60*1000;
-
-        while (System.currentTimeMillis() < endTime) {
-            try {
-                for (int i = 0; i < n; i++) {
-                    executor.execute(new MainThread(i + 1));
-                }
-                numberOfOperations += n;
-            } catch (Exception err) {
-                err.printStackTrace();
-            }
-        }
-        executor.shutdown(); // once you are done with ExecutorService
-        res[0] = numberOfOperations;
-        double percentageOfProductsLessThan0StockUnits = productController.calculatePercentageWithStockLevelLessThan0();
-        res[1] = percentageOfProductsLessThan0StockUnits;
-        return res;
-    }
-
     public static void main(String[] args) throws SQLException, IOException {
         String db_user = args[0];
         String db_password = args[1];
@@ -193,28 +170,7 @@ public class Main extends Thread {
 
 //        initializeDatabaseRecords();
 
-
-//        Map<Integer, double[]> map = new HashMap<>();
-            PrintWriter out = new PrintWriter(new FileWriter("output.txt", true), true);
-        for (int n = 1; n <= 10; n++) {
-            System.out.println("Test with " + n + " threads.");
-            double[] res = runThreads(n);
-            String testOutput = "Test " + n + " threads: \n" +
-            "Operation count: " + res[0] + "\n" +
-            "Percentage of products with stock level < 0: " + res[1] + "\n" +
-                    "-----------------\n";
-            out.write(testOutput);
-            System.out.println("Test " + n + " done.");
-        }
-//        logOutput(map);
-        out.close();
-    }
-
-    private static void logOutput(Map<Integer, double[]> map) throws IOException {
-        PrintWriter out = new PrintWriter(new FileWriter("output.txt", true), true);
-        for (Integer key : map.keySet()) {
-            out.write(key + "->" + Arrays.toString(map.get(key)) + "\n");
-        }
-        out.close();
+        Test test = new Test();
+        test.test(db_user, db_password);
     }
 }

@@ -1,0 +1,40 @@
+Test 1 threads: 
+Operation count: 1829
+Percentage of products with stock level < 0: 0
+-----------------
+Test 2 threads: 
+Operation count: 4
+Percentage of products with stock level < 0: 0
+-----------------
+Test 3 threads: 
+Operation count: 3
+Percentage of products with stock level < 0: 0
+-----------------
+Test 4 threads: 
+Operation count: 12
+Percentage of products with stock level < 0: 0
+-----------------
+Test 5 threads: 
+Operation count: 10
+Percentage of products with stock level < 0: 0
+-----------------
+Test 6 threads: 
+Operation count: 6
+Percentage of products with stock level < 0: 0
+-----------------
+Test 7 threads: 
+Operation count: 7
+Percentage of products with stock level < 0: 0
+-----------------
+Test 8 threads: 
+Operation count: 16
+Percentage of products with stock level < 0: 0
+-----------------
+Test 9 threads: 
+Operation count: 9
+Percentage of products with stock level < 0: 0
+-----------------
+Test 10 threads: 
+Operation count: 10
+Percentage of products with stock level < 0: 0
+-----------------
