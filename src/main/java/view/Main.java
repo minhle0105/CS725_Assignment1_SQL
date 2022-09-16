@@ -15,6 +15,13 @@ import java.util.*;
 
 public class Main {
 
+    static ProductController productController;
+    static UserController userController;
+
+    static StringBuilder alphabet = new StringBuilder();
+
+    static Random random;
+
 //    public static void main(String[] args) throws SQLException {
 //        Scanner sc = new Scanner(System.in);
 ////        System.out.println("Enter SQL username: ");
@@ -197,7 +204,7 @@ public class Main {
 //        sc.close();
 //    }
 
-    private static String generateRandomString(Random random, String alphabet, int length) {
+    private static String generateRandomString(int length) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < length; i++) {
             int value = random.nextInt(alphabet.length());
@@ -206,49 +213,105 @@ public class Main {
         return sb.toString();
     }
 
-    private static int generateRandomInt(Random random, int high) {
+    private static int generateRandomInt(int high) {
         return random.nextInt(high);
     }
 
-    private static double generateRandomDouble(Random random, double high) {
+    private static double generateRandomDouble(double high) {
         return high * random.nextDouble();
     }
 
-    private static List<Product> generateProducts() {
-        Random random = new Random();
-        StringBuilder alphabet = new StringBuilder();
-        // 65-90
-        // 97-122
+    private static void generateAlphabetString() {
         for (int i = 65; i < 90; i++) {
             alphabet.append((char) i);
         }
         for (int i = 97; i < 122; i++) {
             alphabet.append((char) i);
         }
+    }
+    private static List<Product> generateProducts(int n) {
+        // 65-90
+        // 97-122
         List<Product> products = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            String id = generateRandomString(random, alphabet.toString(), 10);
-            String name = generateRandomString(random, alphabet.toString(), 10);
-            String description = generateRandomString(random, alphabet.toString(), 100);
-            double price = generateRandomDouble(random, 50.0);
-            int number_of_units = generateRandomInt(random, 50);
+        for (int i = 0; i < n; i++) {
+            String id = generateRandomString(10);
+            String name = generateRandomString(10);
+            String description = generateRandomString(100);
+            double price = generateRandomDouble(50.0);
+            int number_of_units = generateRandomInt(50);
             Product product = new Product(id, name, description, price, number_of_units);
             products.add(product);
         }
         return products;
     }
 
+    private static List<User> generateUsers(int n) {
+        List<User> users = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            String username = generateRandomString(20);
+            String password = generateRandomString(20);
+            String firstname = generateRandomString(10);
+            String lastname = generateRandomString(10);
+            User user = new User(username, password, firstname, lastname);
+            users.add(user);
+        }
+        return users;
+    }
+
+    private static List<Review> generateReviews(List<User> users, List<Product> products, int n) {
+        List<Review> reviews = new ArrayList<>();
+        int numberOfUsers = users.size();
+        int numberOfProducts = products.size();
+        for (int i = 0; i < n; i++) {
+            String textReview = generateRandomString(500);
+            int rating = generateRandomInt(5);
+            int randomUserIndex = generateRandomInt(numberOfUsers);
+            int randomProductIndex = generateRandomInt(numberOfProducts);
+            Review review = new Review(users.get(randomUserIndex).getUsername(), products.get(randomProductIndex).getId(), new Date(Calendar.getInstance().getTime().getTime()), textReview, rating);
+            reviews.add(review);
+        }
+        return reviews;
+    }
+
+    private static void generateOrders(List<User> users, List<Product> products, int n) throws SQLException {
+        int numberOfUsers = users.size();
+        int numberOfProducts = products.size();
+        for (int i = 0; i < n; i++) {
+            List<String> productNames = new ArrayList<>();
+            List<Integer> quantities = new ArrayList<>();
+            int randomUserIndex = generateRandomInt(numberOfUsers);
+            for (int j = 0; j < numberOfProducts; j++) {
+                int id = generateRandomInt(numberOfProducts);
+                productNames.add(products.get(id).getName());
+                int quantity = generateRandomInt(30);
+                quantities.add(quantity);
+            }
+            userController.submitOrder(users.get(randomUserIndex).getUsername(), productNames, quantities);
+        }
+    }
 
     public static void main(String[] args) throws SQLException {
+        generateAlphabetString();
+        random = new Random();
         String db_user = args[0];
         String db_password = args[1];
         MyJDBC jdbc = new MyJDBC(db_user, db_password);
         jdbc.connect();
         Connection connection = jdbc.getConnection();
-        ProductController productController = new ProductController(connection);
-        List<Product> products = generateProducts();
+        productController = new ProductController(connection);
+        userController = new UserController(connection);
+        List<Product> products = generateProducts(10);
         for (Product product : products) {
             productController.add(product);
         }
+        List<User> users = generateUsers(10);
+        for (User user : users) {
+            userController.CreateAccount(user);
+        }
+        List<Review> reviews = generateReviews(users, products, 200);
+        for (Review review : reviews) {
+            userController.submitReview(review);
+        }
+        generateOrders(users, products, 100);
     }
 }

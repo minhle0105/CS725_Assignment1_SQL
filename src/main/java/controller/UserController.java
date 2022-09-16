@@ -16,8 +16,8 @@ public class UserController {
         this.userService = new UserService(connection);
     }
 
-    public boolean CreateAccount(String username, String password, String firstname, String lastname) throws SQLException {
-        return this.userService.add(username, password, firstname, lastname);
+    public boolean CreateAccount(User user) throws SQLException {
+        return this.userService.add(user.getUsername(), user.getPassword(), user.getFirstName(), user.getLastName());
     }
 
     public List<User> findAll() {

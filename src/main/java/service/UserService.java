@@ -22,7 +22,7 @@ public class UserService implements IUserService {
         try {
             List<User> users = new ArrayList<>();
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM User");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM Users");
             while (resultSet.next()) {
                 User user = new User(resultSet.getString("username"),
                         resultSet.getString("password"),
@@ -40,12 +40,12 @@ public class UserService implements IUserService {
     }
 
     public boolean add(String username, String password, String firstname, String lastname) throws SQLException {
-        String lookupQuery = "SELECT * FROM User WHERE username=?;";
+        String lookupQuery = "SELECT * FROM Users WHERE username=?;";
         PreparedStatement p = connection.prepareStatement(lookupQuery);
         p.setString(1, username);
         ResultSet lookupQueryResult = p.executeQuery();
         if (!lookupQueryResult.next()) {
-            String insertQuery = "INSERT INTO User (`username`, `password`, `firstname`, `lastname`) VALUES (?, ?, ?, ?);";
+            String insertQuery = "INSERT INTO Users (`username`, `password`, `firstname`, `lastname`) VALUES (?, ?, ?, ?);";
             PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, password);
@@ -64,7 +64,7 @@ public class UserService implements IUserService {
     }
 
     public boolean login(String username, String password) throws SQLException {
-        String lookupQuery = "SELECT * FROM User WHERE username=? AND password=?";
+        String lookupQuery = "SELECT * FROM Users WHERE username=? AND password=?";
         PreparedStatement p = connection.prepareStatement(lookupQuery);
         p.setString(1, username);
         p.setString(2, password);
@@ -74,6 +74,7 @@ public class UserService implements IUserService {
 
     public boolean submitOrder(String username, List<String> products, List<Integer> quantities) throws SQLException {
         List<CheckoutItem> checkoutItems = new ArrayList<>();
+        boolean allValidPurchases = true;
         for (int i = 0; i < products.size(); i++) {
             int quantityDemanded = quantities.get(i);
             String lookupQuantityQuery = "SELECT * FROM Products WHERE name = ?;";
@@ -82,14 +83,14 @@ public class UserService implements IUserService {
             p.setString(1, productName);
             ResultSet resultSet = p.executeQuery();
             if (!resultSet.next()) {
-                connection.rollback();
-                return false;
+                allValidPurchases = false;
+                break;
             }
             int quantity = Integer.parseInt(resultSet.getString("number_of_units"));
             String productId = resultSet.getString("idProducts");
             if (quantity < quantityDemanded) {
-                connection.rollback();
-                return false;
+                allValidPurchases = false;
+                break;
             }
             int newQuantity = quantity - quantityDemanded + quantityDemanded;
             String updateQuantityQuery = "UPDATE Products SET number_of_units = ? WHERE name = ?;";
@@ -99,6 +100,10 @@ public class UserService implements IUserService {
             p.setInt(1, newQuantity);
             p.setString(2, productName);
             p.execute();
+        }
+        if (!allValidPurchases) {
+            connection.rollback();
+            return false;
         }
         this.orderService = new OrderService(this.connection);
         Order order = new Order(checkoutItems, new Date(Calendar.getInstance().getTime().getTime()), username);
@@ -127,7 +132,7 @@ public class UserService implements IUserService {
             Date date = review.getDate();
             String reviewText = review.getText();
             int rating = review.getRating();
-            String addReview = "INSERT INTO Review (`username`, `product_id`, `date`, `content`, `rating`) VALUES (?, ?, ?, ?, ?)";
+            String addReview = "INSERT INTO Reviews (`username`, `product_id`, `date`, `content`, `rating`) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement p = connection.prepareStatement(addReview);
             p.setString(1, username);
             p.setString(2, productId);
@@ -139,6 +144,7 @@ public class UserService implements IUserService {
             return true;
         }
         catch (SQLException e) {
+            e.printStackTrace();
             connection.rollback();
             return false;
         }
